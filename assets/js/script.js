@@ -1,67 +1,71 @@
-//Creazione elementi
-const node = document.createElement("div")
+// Funzioni per creare gli elementi in base alle caratteristiche richieste
 
-const firstNode = document.createElement("div")
-const h1 = document.createElement("h1")
-const h2 = document.createElement("h2")
-
-const secondNode = document.createElement("div")
-const plus = document.createElement("span")
-const reset = document.createElement("span")
-const minus = document.createElement("span")
-
-//Associazione
-node.classList = "container"
-
-firstNode.classList = "wrapper"
-h1.textContent = "CONTATORE"
-h2.id = "valore"
-h2.textContent = '0'
-
-secondNode.classList = "flex-container"
-plus.id = "piu"
-plus.textContent = "+"
-
-minus.id = "meno"
-minus.textContent = "-"
-
-reset.id = "resetta"
-reset.textContent = "RESET"
-
-//Gestione DOM
-document.body.appendChild(node)
-
-node.appendChild(firstNode)
-firstNode.appendChild(h1)
-firstNode.appendChild(h2)
-
-node.appendChild(secondNode)
-secondNode.appendChild(plus)
-secondNode.appendChild(reset)
-secondNode.appendChild(minus)
-
-//Start iniziale
-let value = 0
-
-// Cambio valore
-function changeValue() {
-    return valore.textContent = value
+//Potevo anche creare un'unica funziona con tutti i parametri 'function creaElementi( tagname, id, classe, testo, click), ma mi risultava troppo confusionaria.
+//In questa maniera mi risulta più facile la gestione, ove dovessi integrare altre funzionalità
+function elementClass(tagName, id, classe) {
+    let element = document.createElement(tagName)
+    element.id = id
+    element.classList = classe
+    return element
 }
 
-//Logica incremento
-piu.addEventListener('click', () => {
-    value = value + 1
-    changeValue()
-})
+function elementText(tagName, id, testo) {
+    let element = document.createElement(tagName)
+    element.id = id
+    element.innerHTML = testo
+    return element
+}
 
-//Logica riduzione
-meno.addEventListener('click', () => {
-    value = value - 1
-    changeValue()
-})
+function elementClick(tagName, id, testo, click) {
+    let element = document.createElement(tagName)
+    element.id = id
+    element.innerHTML = testo
+    element.onclick = click
+    return element
+}
 
-//Logica reset
-resetta.addEventListener('click', () => {
-    value = 0
-    changeValue()
-})
+// Creo gli elementi tramite le funzioni con dei parametri specifici
+const node = elementClass('div', 'node', 'container')
+const firstNode = elementClass('div', 'firstNode', 'wrapper')
+const secondNode = elementClass('div', 'secondNode', 'flex-container')
+const text = [
+    elementText('h1', 'testo', 'Contatore'),
+    elementText('h2', 'valore', '0')
+]
+const button = [
+    elementClick('span', 'piu', '+', () => { checkValue(+1) }),
+    elementClick('span', 'resetta', 'RESET', () => { checkValue(0) }),
+    elementClick('span', 'meno', '-', () => { checkValue(-1) })
+]
+
+//Funzione che posiziona gli elementi usando AppendChild (Genitore, Figlio)
+function positionElement(elementoGenitore, elementoFiglio = [], id = false) {
+    let elementoPrincipale
+    if (id) {
+        elementoPrincipale = document.getElementById(elementoGenitore.id)
+    } else {
+        //Questo 'else' è solo per la gestione iniziale con il 'body', il resto passa tutto dal primo if (dichiarato come true)
+        elementoPrincipale = document.querySelector(elementoGenitore)
+    }
+    elementoFiglio.forEach(el => {
+        elementoPrincipale.appendChild(el)
+    });
+}
+
+//Posiziono gli elementi utilizzando la funzione sopra
+positionElement('body', [node])
+
+positionElement(node, [firstNode], true)
+positionElement(firstNode, text, true)
+
+positionElement(node, [secondNode], true)
+positionElement(secondNode, button, true)
+
+//Funzione per la gestione del Counter
+function checkValue(numero) {
+    let change = document.getElementById('valore')
+    let risultato = parseInt(change.innerHTML)
+    if (numero == 0) return change.innerHTML = 0
+    risultato += numero
+    return change.innerHTML = risultato
+}
